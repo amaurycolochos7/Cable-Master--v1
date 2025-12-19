@@ -14,6 +14,7 @@ import {
     ChevronRightIcon,
     PhoneIcon,
     ExclamationTriangleIcon,
+    TrashIcon,
 } from '@heroicons/react/24/outline';
 import { supabase } from '@/lib/supabase';
 
@@ -61,6 +62,29 @@ export default function TicketsFallasPage() {
         setLoading(false);
     };
 
+    const handleDelete = async (ticketId: string, folio: string) => {
+        if (!confirm(`¿Eliminar ticket ${folio}? Esta acción no se puede deshacer.`)) {
+            return;
+        }
+
+        try {
+            const res = await fetch(`/api/tickets/${ticketId}`, {
+                method: 'DELETE',
+            });
+
+            if (res.ok) {
+                setTickets(prev => prev.filter(t => t.id !== ticketId));
+                setTotal(prev => prev - 1);
+            } else {
+                const data = await res.json();
+                alert(data.error || 'Error al eliminar');
+            }
+        } catch (error) {
+            console.error('Delete error:', error);
+            alert('Error de conexión');
+        }
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -99,7 +123,18 @@ export default function TicketsFallasPage() {
                                     <td className="px-4 py-4 text-sm max-w-xs truncate">{t.fault_description}</td>
                                     <td className="px-4 py-4"><span className={`badge ${statusLabels[t.fault_status]?.color}`}>{statusLabels[t.fault_status]?.label}</span></td>
                                     <td className="px-4 py-4 text-sm">{new Date(t.created_at).toLocaleDateString('es-MX')}</td>
-                                    <td className="px-4 py-4"><Link href={`/admin/tickets/fallas/${t.id}`} className="text-primary hover:underline">Ver</Link></td>
+                                    <td className="px-4 py-4">
+                                        <div className="flex items-center gap-2">
+                                            <Link href={`/admin/tickets/fallas/${t.id}`} className="text-primary hover:underline">Ver</Link>
+                                            <button
+                                                onClick={() => handleDelete(t.id, t.folio)}
+                                                className="text-red-500 hover:text-red-700"
+                                                title="Eliminar"
+                                            >
+                                                <TrashIcon className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>

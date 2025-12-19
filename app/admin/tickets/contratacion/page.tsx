@@ -16,6 +16,7 @@ import {
     UserIcon,
     PhoneIcon,
     MapPinIcon,
+    TrashIcon,
 } from '@heroicons/react/24/outline';
 import { supabase } from '@/lib/supabase';
 
@@ -108,6 +109,30 @@ export default function TicketsContratacionPage() {
         e.preventDefault();
         setPage(1);
         fetchTickets();
+    };
+
+    const handleDelete = async (ticketId: string, folio: string) => {
+        if (!confirm(`¿Eliminar ticket ${folio}? Esta acción no se puede deshacer.`)) {
+            return;
+        }
+
+        try {
+            const res = await fetch(`/api/tickets/${ticketId}`, {
+                method: 'DELETE',
+            });
+
+            if (res.ok) {
+                // Remove from local state immediately
+                setTickets(prev => prev.filter(t => t.id !== ticketId));
+                setTotal(prev => prev - 1);
+            } else {
+                const data = await res.json();
+                alert(data.error || 'Error al eliminar');
+            }
+        } catch (error) {
+            console.error('Delete error:', error);
+            alert('Error de conexión');
+        }
     };
 
     return (
@@ -276,13 +301,22 @@ export default function TicketsContratacionPage() {
                                             </div>
                                         </td>
                                         <td className="px-4 py-4">
-                                            <Link
-                                                href={`/admin/tickets/contratacion/${ticket.id}`}
-                                                className="inline-flex items-center gap-1 text-primary hover:underline"
-                                            >
-                                                <EyeIcon className="w-4 h-4" />
-                                                Ver
-                                            </Link>
+                                            <div className="flex items-center gap-2">
+                                                <Link
+                                                    href={`/admin/tickets/contratacion/${ticket.id}`}
+                                                    className="inline-flex items-center gap-1 text-primary hover:underline"
+                                                >
+                                                    <EyeIcon className="w-4 h-4" />
+                                                    Ver
+                                                </Link>
+                                                <button
+                                                    onClick={() => handleDelete(ticket.id, ticket.folio)}
+                                                    className="inline-flex items-center gap-1 text-red-500 hover:text-red-700 hover:underline"
+                                                    title="Eliminar ticket"
+                                                >
+                                                    <TrashIcon className="w-4 h-4" />
+                                                </button>
+                                            </div>
                                         </td>
                                     </motion.tr>
                                 ))}
