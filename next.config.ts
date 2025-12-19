@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Optimize package imports for tree-shaking
+  experimental: {
+    optimizePackageImports: ['@heroicons/react', 'framer-motion'],
+  },
+
   // Security Headers
   async headers() {
     return [
