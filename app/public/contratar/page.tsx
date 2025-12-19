@@ -22,6 +22,10 @@ import {
 import { createContractTicketSchema, type CreateContractTicket } from '@/lib/schemas';
 import { supabase } from '@/lib/supabase';
 
+// Force dynamic rendering - prevents static prerendering issues with useSearchParams
+export const dynamic = 'force-dynamic';
+
+
 interface Package {
     id: string;
     name: string;
