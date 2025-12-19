@@ -15,7 +15,7 @@ import {
 import { supabase } from '@/lib/supabase';
 import BannerCarousel from '@/components/BannerCarousel';
 
-// Speedtest-style gauge animation - Clean Arc Style
+// Speedtest-style gauge animation - Clean Arc Style with realistic tachometer effect
 const SpeedGauge = () => {
     const [speed, setSpeed] = useState(0);
     const [phase, setPhase] = useState<'running' | 'complete'>('running');
@@ -24,22 +24,36 @@ const SpeedGauge = () => {
     useEffect(() => {
         let animationFrame: number;
         let startTime: number;
-        const duration = 2500;
+        const duration = 10000; // 10 seconds for full animation
 
         const animate = (timestamp: number) => {
             if (!startTime) startTime = timestamp;
             const elapsed = timestamp - startTime;
             const progress = Math.min(elapsed / duration, 1);
 
-            // Smooth easing
-            const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-            const currentSpeed = Math.round(easeOutQuart * targetSpeed);
+            // Base progression with slow easing
+            const easeOutSlow = 1 - Math.pow(1 - progress, 2);
+            const baseSpeed = easeOutSlow * targetSpeed;
+
+            // Add tachometer oscillation effect (simulates network speed variations)
+            // The oscillation gets smaller as we approach the target
+            const oscillationStrength = (1 - progress) * 25; // Oscillations decrease over time
+            const oscillationFrequency = 3; // Number of full oscillations
+            const oscillation = Math.sin(progress * oscillationFrequency * Math.PI * 2) * oscillationStrength;
+
+            // Add smaller rapid fluctuations like a real speed test
+            const microFluctuation = Math.sin(elapsed / 100) * 5 * (1 - progress);
+
+            const currentSpeed = Math.max(0, Math.min(targetSpeed,
+                Math.round(baseSpeed + oscillation + microFluctuation)
+            ));
 
             setSpeed(currentSpeed);
 
             if (progress < 1) {
                 animationFrame = requestAnimationFrame(animate);
             } else {
+                setSpeed(targetSpeed); // Ensure we end at exactly 300
                 setPhase('complete');
             }
         };
@@ -55,7 +69,7 @@ const SpeedGauge = () => {
     }, []);
 
     return (
-        <div className="relative w-64 h-40 mx-auto">
+        <div className="relative w-48 h-32 sm:w-64 sm:h-40 mx-auto">
             {/* Outer glow effect */}
             <motion.div
                 className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500/30 via-primary/30 to-purple-500/30 blur-2xl"
@@ -102,20 +116,20 @@ const SpeedGauge = () => {
                     filter="url(#arcGlow)"
                     initial={{ pathLength: 0 }}
                     animate={{ pathLength: speed / targetSpeed }}
-                    transition={{ duration: 0.15, ease: "linear" }}
+                    transition={{ duration: 0.1, ease: "linear" }}
                 />
 
                 {/* Speed markers - positioned outside the arc */}
-                <text x="15" y="118" fill="rgba(255,255,255,0.6)" fontSize="11" fontWeight="500" textAnchor="middle">0</text>
-                <text x="58" y="50" fill="rgba(255,255,255,0.6)" fontSize="11" fontWeight="500" textAnchor="middle">100</text>
-                <text x="142" y="50" fill="rgba(255,255,255,0.6)" fontSize="11" fontWeight="500" textAnchor="middle">200</text>
-                <text x="185" y="118" fill="rgba(255,255,255,0.6)" fontSize="11" fontWeight="500" textAnchor="middle">300</text>
+                <text x="15" y="118" fill="rgba(255,255,255,0.7)" fontSize="12" fontWeight="600" textAnchor="middle">0</text>
+                <text x="58" y="50" fill="rgba(255,255,255,0.7)" fontSize="12" fontWeight="600" textAnchor="middle">100</text>
+                <text x="142" y="50" fill="rgba(255,255,255,0.7)" fontSize="12" fontWeight="600" textAnchor="middle">200</text>
+                <text x="185" y="118" fill="rgba(255,255,255,0.7)" fontSize="12" fontWeight="600" textAnchor="middle">300</text>
             </svg>
 
             {/* Center speed display */}
-            <div className="absolute inset-x-0 bottom-4 flex flex-col items-center">
+            <div className="absolute inset-x-0 bottom-2 sm:bottom-4 flex flex-col items-center">
                 <motion.div
-                    className="text-5xl font-black text-white leading-none"
+                    className="text-4xl sm:text-5xl font-black text-white leading-none"
                     animate={{
                         scale: phase === 'complete' ? [1, 1.1, 1] : 1
                     }}
@@ -124,7 +138,7 @@ const SpeedGauge = () => {
                     {speed}
                 </motion.div>
                 <motion.div
-                    className="text-primary text-sm font-bold mt-1"
+                    className="text-primary text-xs sm:text-sm font-bold mt-1"
                     animate={{ opacity: phase === 'complete' ? [1, 0.6, 1] : 1 }}
                     transition={{ duration: 1.5, repeat: phase === 'complete' ? Infinity : 0 }}
                 >
@@ -139,7 +153,8 @@ export default function PublicHomePage() {
     const heroRef = useRef(null);
     const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
     const y = useTransform(scrollYProgress, [0, 1], [0, 200]);
-    const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+    // Opacity fades much later - visible until 90% scroll
+    const opacity = useTransform(scrollYProgress, [0, 0.9], [1, 0]);
     const [packages, setPackages] = useState<any[]>([]);
     const [packagesLoading, setPackagesLoading] = useState(true);
 
@@ -208,11 +223,11 @@ export default function PublicHomePage() {
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.8, delay: 0.2 }}
-                                className="text-5xl md:text-7xl font-black text-white mb-6 leading-tight"
+                                className="text-3xl sm:text-5xl md:text-7xl font-black text-white mb-6 leading-tight"
                             >
                                 LA MEJOR
                                 <br />
-                                <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-secondary">
+                                <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-secondary text-2xl sm:text-4xl md:text-6xl">
                                     PROGRAMACIÓN
                                 </span>
                             </motion.h1>
