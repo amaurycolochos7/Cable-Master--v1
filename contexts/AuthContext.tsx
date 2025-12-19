@@ -7,13 +7,13 @@ import { useRouter } from 'next/navigation';
 
 // Demo credentials for testing
 const DEMO_CREDENTIALS = {
-    email: 'admin@cablemaster.com',
-    password: 'Demo2024!',
+    email: 'admin.cablemaster@mail.com',
+    password: 'admin123*',
 };
 
 const DEMO_PROFILE: Profile = {
     id: 'demo-user-id',
-    email: 'admin@cablemaster.com',
+    email: 'admin.cablemaster@mail.com',
     full_name: 'Admin Demo',
     role: 'master',
     phone: '961 248 3470',

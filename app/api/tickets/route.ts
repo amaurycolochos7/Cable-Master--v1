@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
 
         const body = await request.json();
 
+
         // Validate input
         const result = createTicketSchema.safeParse(body);
         if (!result.success) {

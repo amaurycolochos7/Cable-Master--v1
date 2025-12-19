@@ -277,7 +277,7 @@ function SeguimientoContent() {
 
                             {/* Timeline */}
                             <div className="card">
-                                <h3 className="font-semibold text-lg mb-6">Progreso de tu solicitud</h3>
+                                <h3 className="font-semibold text-lg mb-6 text-gray-900">Progreso de tu solicitud</h3>
 
                                 <div className="space-y-0">
                                     {trackingData.timeline.map((step, index) => (

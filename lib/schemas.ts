@@ -45,8 +45,9 @@ export const createContractTicketSchema = z.object({
     community: z.string().optional(),
     municipality: z.string().optional(),
     references_text: z.string().optional(),
-    package_id: z.string().uuid('Selecciona un paquete válido').optional(),
-    promotion_id: z.string().uuid().optional(),
+    // Accept UUID, empty string, or null for optional UUID fields
+    package_id: z.string().uuid('Selecciona un paquete válido').optional().nullable(),
+    promotion_id: z.string().uuid().optional().nullable(),
     preferred_schedule: z.string().optional(),
 });
 export type CreateContractTicket = z.infer<typeof createContractTicketSchema>;

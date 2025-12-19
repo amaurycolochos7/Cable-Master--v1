@@ -97,7 +97,7 @@ export default function UsuariosPage() {
             <div className="flex gap-2 flex-wrap">
                 <button
                     onClick={() => setRoleFilter('')}
-                    className={`px-3 py-1.5 rounded-full text-sm ${!roleFilter ? 'bg-gray-800 text-white' : 'bg-gray-100'}`}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium ${!roleFilter ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-800'}`}
                 >
                     Todos ({users.length})
                 </button>
@@ -105,7 +105,7 @@ export default function UsuariosPage() {
                     <button
                         key={role}
                         onClick={() => setRoleFilter(role)}
-                        className={`px-3 py-1.5 rounded-full text-sm ${roleFilter === role ? 'bg-gray-800 text-white' : 'bg-gray-100'}`}
+                        className={`px-3 py-1.5 rounded-full text-sm font-medium ${roleFilter === role ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-800'}`}
                     >
                         {label} ({users.filter(u => u.role === role).length})
                     </button>
