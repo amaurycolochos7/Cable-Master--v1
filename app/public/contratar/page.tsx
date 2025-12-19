@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -41,7 +41,20 @@ interface Promotion {
     background_color: string;
 }
 
-export default function ContratarPage() {
+// Loading fallback for Suspense
+function ContratarLoading() {
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-12 flex items-center justify-center">
+            <div className="text-center">
+                <div className="animate-spin h-12 w-12 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4" />
+                <p className="text-gray-600">Cargando...</p>
+            </div>
+        </div>
+    );
+}
+
+// Inner component that uses useSearchParams
+function ContratarContent() {
     const searchParams = useSearchParams();
     const promoId = searchParams.get('promo');
 
@@ -650,5 +663,14 @@ export default function ContratarPage() {
                 </AnimatePresence>
             </div>
         </div>
+    );
+}
+
+// Default export wraps content in Suspense for useSearchParams
+export default function ContratarPage() {
+    return (
+        <Suspense fallback={<ContratarLoading />}>
+            <ContratarContent />
+        </Suspense>
     );
 }
